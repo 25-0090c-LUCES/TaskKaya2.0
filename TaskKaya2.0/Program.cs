@@ -302,8 +302,27 @@
                         Thread.Sleep(1500);
                     }
                 }
+                else if (choice == 0)
+                {
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    Console.WriteLine("\nThank you for using TaskKaya!");
+                    Console.ResetColor();
+
+                    Thread.Sleep(1000);
+                    Environment.Exit(0);
+                }
+                else
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("\n[ERROR] Invalid choice. PLease try again.");
+                    Console.ResetColor();
+
+                    Thread.Sleep(1000);
+                }
             }
+
         }
+     
         static void RunUniversalDashboard(string username)
         {
             while (true)
