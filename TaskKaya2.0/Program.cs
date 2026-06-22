@@ -84,19 +84,35 @@
                         Console.WriteLine("===============================================================================");
                         Console.ResetColor();
 
-                        Console.Write(" Username: ");
+                        Console.Write("Enter Username: ");
                         string u = Console.ReadLine().Trim();
                         if (u == "/")
                         {
                             break;
                         }
+                        if (string.IsNullOrWhiteSpace(u))
+                        {
+                            Console.ForegroundColor = ConsoleColor.Red;
+                            Console.WriteLine("\n[ERROR] Username cannot be empty. Please try again.");
+                            Console.ResetColor();
+                            Thread.Sleep(1000);
+                            continue;
+                        }
 
 
-                        Console.Write(" Password: ");
+                        Console.Write("Enter Password: ");
                         string p = Console.ReadLine().Trim();
                         if (p == "/")
                         {
                             break;
+                        }
+                        if (string.IsNullOrWhiteSpace(p))
+                        {
+                            Console.ForegroundColor = ConsoleColor.Red;
+                            Console.WriteLine("\n[ERROR] Username cannot be empty.");
+                            Console.ResetColor();
+                            Thread.Sleep(1000);
+                            continue;
                         }
 
                         bool found = false;
@@ -129,7 +145,7 @@
                             else
                             {
                                 Console.ForegroundColor = ConsoleColor.Red;
-                                Console.WriteLine("\n[ERROR] Incorrect username or password. Try Again.");
+                                Console.WriteLine("\n[ERROR] Incorrect username or password. Please try Again.");
                                 Console.ResetColor();
                                 Thread.Sleep(1200);
                             }
@@ -167,7 +183,7 @@
                         if (exists)
                         {
                             Console.ForegroundColor = ConsoleColor.Red;
-                            Console.WriteLine("\n[ERROR] Username already exists.");
+                            Console.WriteLine("\n[ERROR] Username already exists. Please try again.");
                             Console.ResetColor();
                             Thread.Sleep(1000);
                             continue;
@@ -176,7 +192,7 @@
                         if (string.IsNullOrWhiteSpace(u))
                         {
                             Console.ForegroundColor = ConsoleColor.Red;
-                            Console.WriteLine("\n[ERROR] Username cannot be empty.");
+                            Console.WriteLine("\n[ERROR] Username cannot be empty. Please try again.");
                             Console.ResetColor();
                             Thread.Sleep(1000);
                             continue;
@@ -202,7 +218,7 @@
                             if (string.IsNullOrWhiteSpace(p))
                             {
                                 Console.ForegroundColor = ConsoleColor.Red;
-                                Console.WriteLine("\n[ERROR] Password cannot be empty.");
+                                Console.WriteLine("\n[ERROR] Password cannot be empty. Please try again.");
                                 Console.ResetColor();
                                 Thread.Sleep(1000);
                                 continue;
@@ -232,7 +248,7 @@
                             if (string.IsNullOrWhiteSpace(l))
                             {
                                 Console.ForegroundColor = ConsoleColor.Red;
-                                Console.WriteLine("\n[ERROR] Location cannot be empty.");
+                                Console.WriteLine("\n[ERROR] Location cannot be empty. Please try again.");
                                 Console.ResetColor();
                                 Thread.Sleep(1000);
                                 continue;
@@ -262,7 +278,7 @@
                             if (c.Length != 11 || !c.All(char.IsDigit))
                             {
                                 Console.ForegroundColor = ConsoleColor.Red;
-                                Console.WriteLine("\n[ERROR] Contact number must contain exactly 11 digits.");
+                                Console.WriteLine("\n[ERROR] Contact number must contain exactly 11 digits. Please try registering again.");
                                 Console.ResetColor();
                                 Thread.Sleep(1000);
                                 continue;
@@ -277,7 +293,7 @@
                             if (contactExists)
                             {
                                 Console.ForegroundColor = ConsoleColor.Red;
-                                Console.WriteLine("\n[ERROR] Contact number is already registered.");
+                                Console.WriteLine("\n[ERROR] Contact number is already registered. Please try registering another number.");
                                 Console.ResetColor();
                                 Thread.Sleep(1000);
                                 continue;
