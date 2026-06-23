@@ -559,14 +559,38 @@
                 }
                 else if (choice == 2)
                 {
-                    Console.Clear();
-                    Console.Write("Enter Location: ");
-                    filterLocation = Console.ReadLine().Trim();
+                    while (true)
+                    {
+                        Console.Clear();
+                        Console.WriteLine("(Enter / to return to main menu.)");
+                        Console.Write("Enter Location: ");
+                        filterLocation = Console.ReadLine().Trim();
+
+                        if (filterLocation == "/")
+                        {
+                            filterLocation = "";
+                            break;
+                        }
+
+                        if (string.IsNullOrWhiteSpace(filterLocation))
+                        {
+                            Console.ForegroundColor = ConsoleColor.Red;
+                            Console.WriteLine("\n[ERROR] Location cannot be empty. Please try again.");
+                            Console.ResetColor();
+                            Thread.Sleep(1000);
+                            continue;
+                        }
+
+                        break;
+                    }
+
+                    if (filterLocation == "")
+                        continue;
                 }
                 else
                 {
                     Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine("\n[ERROR] Invalid choice. Please Try Again");
+                    Console.WriteLine("\n[ERROR] Invalid choice. Please Try Again.");
                     Console.ResetColor();
                     Thread.Sleep(1000);
                     continue;
@@ -606,11 +630,20 @@
                     continue;
                 }
 
-                Console.Write("\nEnter Job ID to apply for (or press Enter to cancel): ");
+                Console.Write("Enter Job ID to apply for(or enter / to return to main menu.): ");
                 string targetId = Console.ReadLine().Trim().ToUpper();
 
-                if (targetId == "")
+                if (targetId == "/")
                     continue;
+
+                if (targetId == "")
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("\n[ERROR] Job ID cannot be empty.");
+                    Console.ResetColor();
+                    Pause();
+                    continue;
+                }
 
                 int matchIndex = -1;
 
@@ -766,7 +799,7 @@
                     Console.Write("Enter number of applicant choice: ");
                     if (int.TryParse(Console.ReadLine(), out appIndex)) break;
                     Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine("[ERROR] Invalid input numbers only.");
+                    Console.WriteLine("[ERROR] Invalid input numbers only. Please try again.");
                     Console.ResetColor();
                 }
                 appIndex--;
@@ -799,7 +832,7 @@
                             Console.Write("Enter action choice: ");
                             if (int.TryParse(Console.ReadLine(), out decision)) break;
                             Console.ForegroundColor = ConsoleColor.Red;
-                            Console.WriteLine("[ERROR] Invalid input numbers only.");
+                            Console.WriteLine("[ERROR] Invalid input numbers only. Please try again.");
                             Console.ResetColor();
                         }
 
@@ -834,7 +867,7 @@
                 else
                 {
                     Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine("[ERROR] Invalid selection index.");
+                    Console.WriteLine("[ERROR] Invalid selection. Please try again.");
                     Console.ResetColor();
                 }
                 Pause();
@@ -859,7 +892,7 @@
                 if (matchIndex == -1)
                 {
                     Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine("\n[ERROR] Match system index mismatch or permissions violation.");
+                    Console.WriteLine("\n[ERROR] Invalid selection. Please try again.");
                     Console.ResetColor();
                     Pause();
                     return;
@@ -1088,7 +1121,7 @@
                 if (!int.TryParse(Console.ReadLine(), out int choice))
                 {
                     Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine("\n[ERROR] Invalid choice.");
+                    Console.WriteLine("\n[ERROR] Invalid input numbers only. Please try again.");
                     Console.ResetColor();
                     Thread.Sleep(1000);
                     continue;
@@ -1125,7 +1158,7 @@
                 else
                 {
                     Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine("\n[ERROR] Invalid choice.");
+                    Console.WriteLine("\n[ERROR] Invalid choice. Please try again.");
                     Console.ResetColor();
                     Thread.Sleep(1000);
                     continue;
