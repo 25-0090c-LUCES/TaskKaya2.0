@@ -6,6 +6,7 @@
     using System.Threading;
     internal class Program
     {
+        // domeng
         // USERNAMES AND PASSWORDS ONLY
         static List<string> UserNames = new List<string>();
         static List<string> UserPasswords = new List<string>();
@@ -1120,7 +1121,7 @@
                 Console.Write("Enter number of choice: ");
                 if (!int.TryParse(Console.ReadLine(), out int choice))
                 {
-                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.ForegroundColor = ConsoleColor.Red;             
                     Console.WriteLine("\n[ERROR] Invalid input numbers only. Please try again.");
                     Console.ResetColor();
                     Thread.Sleep(1000);
@@ -1202,7 +1203,7 @@
                 Pause();
             }
         }
-        static void AddNotification(string target, string category, string message)
+                        static void AddNotification(string target, string category, string message)
         {
             LiveNotifications.Enqueue(target + "|" + category + "|UNREAD|" + message);
             SaveData();
