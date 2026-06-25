@@ -123,7 +123,7 @@
                             {
                                 found = true;
                                 Console.ForegroundColor = ConsoleColor.Green;
-                                Console.WriteLine("\n [SUCCESS] LoggedIn Successfully! Welcome back, " + UserNames[i] + "!");
+                                Console.WriteLine("\n[SUCCESS] LoggedIn Successfully! Welcome back, " + UserNames[i] + "!");
                                 Console.ResetColor();
                                 Thread.Sleep(1200);
                                 return UserNames[i];
@@ -138,15 +138,16 @@
                             if (left == 0)
                             {
                                 Console.ForegroundColor = ConsoleColor.Red;
-                                Console.WriteLine("\n[ERROR] Too many failed attempts. Access temporarily locked.");
+                                Console.WriteLine("\n[ERROR] Too many failed attempts. Access temporarily locked. Returning to main menu.");
                                 Console.ResetColor();
-                                Thread.Sleep(3000);
-                                attempts = 0;
+                                Thread.Sleep(1200);
+                                break;
+
                             }
                             else
                             {
                                 Console.ForegroundColor = ConsoleColor.Red;
-                                Console.WriteLine("\n[ERROR] Incorrect username or password. Please try Again.");
+                                Console.WriteLine("\n[ERROR] We couldn't sign you in. The username may not exist, or the password entered is incorrect. Please check your credentials and try again.");
                                 Console.ResetColor();
                                 Thread.Sleep(1200);
                             }
@@ -347,7 +348,7 @@
                 Console.Clear();
                 Console.ForegroundColor = ConsoleColor.Cyan;
                 Console.WriteLine("===============================================================================");
-                Console.WriteLine("  DASHBOARD | USER: " + username.ToUpper());
+                Console.WriteLine("  DASHBOARD | USER: " + username.ToUpper() + " | RATING: " + GetUserAverageRating(username));
                 Console.WriteLine("===============================================================================");
                 Console.ResetColor();
 
@@ -383,7 +384,7 @@
                 if (!int.TryParse(Console.ReadLine(), out int choice))
                 {
                     Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine("\n[ERROR] Invalid choice.");
+                    Console.WriteLine("\n[ERROR] Invalid input numbers only. Please Try Again.");
                     Console.ResetColor();
                     Thread.Sleep(1000);
                     continue;
@@ -400,7 +401,7 @@
                     case 0: return;
                     default:
                         Console.ForegroundColor = ConsoleColor.Red;
-                        Console.WriteLine("\n[ERROR] Invalid choice.");
+                        Console.WriteLine("\n[ERROR] Invalid choice. Please try again.");
                         Console.ResetColor();
                         Thread.Sleep(1000);
                         break;
@@ -715,7 +716,7 @@
                     string stars = JobRatings[i];
                     if (!string.IsNullOrEmpty(stars) && stars != "N/A")
                     {
-                        totalStars += stars.Length; // Length gives count of '★' characters
+                        totalStars += stars.Length;
                         jobCount++;
                     }
                 }
@@ -723,7 +724,7 @@
 
             if (jobCount == 0) return "No performance reviews yet";
             int average = (int)Math.Round((double)totalStars / jobCount);
-            return $"{new string('★', average)} ({jobCount} jobs completed)";
+            return new string('*', average);
         }
         static void ReviewAndVerifyTasks(string username)
         {
