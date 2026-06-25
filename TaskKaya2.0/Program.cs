@@ -269,18 +269,25 @@
                             Console.WriteLine("=========== REGISTER NEW ACCOUNT ===========");
                             Console.WriteLine($"Enter Username: {u}");
                             Console.WriteLine($"Enter Password: {p}");
-                            Console.WriteLine($"Enter Location: {l}");
-                            Console.Write("Enter Contact Number: ");
+                            Console.WriteLine($"Enter Location: {l}");                        
+                            Console.Write("Enter Contact Number (Format: 09XXXXXXXXX): ");
                             c = Console.ReadLine().Trim();
-                            if (c == "/")
-                            {
-                                cancelled = true; break;
-                            }
+
+                            if (c == "/") { cancelled = true; break; }
 
                             if (c.Length != 11 || !c.All(char.IsDigit))
                             {
                                 Console.ForegroundColor = ConsoleColor.Red;
-                                Console.WriteLine("\n[ERROR] Contact number must contain exactly 11 digits. Please try registering again.");
+                                Console.WriteLine("\n[ERROR] Contact number must be exactly 11 digits.");
+                                Console.ResetColor();
+                                Thread.Sleep(1000);
+                                continue;
+                            }
+
+                            if (!c.StartsWith("09"))
+                            {
+                                Console.ForegroundColor = ConsoleColor.Red;
+                                Console.WriteLine("\n[ERROR] Contact number must start with 09. Please try again.");
                                 Console.ResetColor();
                                 Thread.Sleep(1000);
                                 continue;
@@ -295,7 +302,7 @@
                             if (contactExists)
                             {
                                 Console.ForegroundColor = ConsoleColor.Red;
-                                Console.WriteLine("\n[ERROR] Contact number is already registered. Please try registering another number.");
+                                Console.WriteLine("\n[ERROR] Contact number is already registered.");
                                 Console.ResetColor();
                                 Thread.Sleep(1000);
                                 continue;
