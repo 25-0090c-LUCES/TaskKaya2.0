@@ -1139,22 +1139,26 @@
 
                 if (choice == 4)
                 {
-                    List<string> otherUsersNotifs = new List<string>();
+                    List<string> retainedNotifs = new List<string>();
                     foreach (string n in LiveNotifications)
                     {
                         string[] parts = n.Split('|');
-                        if (!parts[0].Equals(username, StringComparison.OrdinalIgnoreCase))
+
+                                // Keep other users' notifications AND keep APPLIED
+                                // notifications addressed to you (those are job applications, not inbox messages)
+                        if (!parts[0].Equals(username, StringComparison.OrdinalIgnoreCase) ||
+                            parts[1] == "APPLIED")
                         {
-                            otherUsersNotifs.Add(n);
+                            retainedNotifs.Add(n);
                         }
                     }
 
                     LiveNotifications.Clear();
-                    foreach (string n in otherUsersNotifs) LiveNotifications.Enqueue(n);
+                    foreach (string n in retainedNotifs) LiveNotifications.Enqueue(n);
 
                     SaveData();
                     Console.ForegroundColor = ConsoleColor.Green;
-                    Console.WriteLine("\n[SUCCESS] Inbox completely cleared.");
+                    Console.WriteLine("\n[SUCCESS] Inbox cleared. Pending job applications were kept.");
                     Console.ResetColor();
                     Pause();
                     continue;
@@ -1211,7 +1215,7 @@
                 Pause();
             }
         }
-                        static void AddNotification(string target, string category, string message)
+        static void AddNotification(string target, string category, string message)
         {
             LiveNotifications.Enqueue(target + "|" + category + "|UNREAD|" + message);
             SaveData();
