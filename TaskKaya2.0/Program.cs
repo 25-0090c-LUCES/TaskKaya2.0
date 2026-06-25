@@ -6,7 +6,7 @@
     using System.Threading;
     internal class Program
     {
-        // domeng
+        // marco
         // USERNAMES AND PASSWORDS ONLY
         static List<string> UserNames = new List<string>();
         static List<string> UserPasswords = new List<string>();
