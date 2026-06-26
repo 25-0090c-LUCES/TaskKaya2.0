@@ -13,7 +13,7 @@
         static List<string> UserLoc = new List<string>();
         static List<string> UserConNum = new List<string>();
 
-        // PARALLEL LISTS FOR JOBS (Replaces Public Class Job)
+        // PARALLEL LISTS FOR JOBS
         static List<string> JobIDs = new List<string>();
         static List<string> JobTitles = new List<string>();
         static List<string> JobBudgets = new List<string>();
@@ -110,7 +110,7 @@
                         if (string.IsNullOrWhiteSpace(p))
                         {
                             Console.ForegroundColor = ConsoleColor.Red;
-                            Console.WriteLine("\n[ERROR] Username cannot be empty.");
+                            Console.WriteLine("\n[ERROR] Password cannot be empty.");
                             Console.ResetColor();
                             Thread.Sleep(1000);
                             continue;
@@ -622,15 +622,31 @@
 
                     if (available && locationMatch)
                     {
+                        string employerLocation = "";
+                        string employerContact = "";
+
+                        for (int j = 0; j < UserNames.Count; j++)
+                        {
+                            if (UserNames[j].Equals(JobEmployers[i], StringComparison.OrdinalIgnoreCase))
+                            {
+                                employerLocation = UserLoc[j];
+                                employerContact = UserConNum[j];
+                                break;
+                            }
+                        }
+
                         Console.WriteLine(
                             $"[ID: {JobIDs[i]}] {JobTitles[i]} | " +
-                            $"Location: {JobLocations[i]} | " +
+                            $"Job Location: {JobLocations[i]} | " +
                             $"Budget: PHP {JobBudgets[i]} | " +
-                            $"Employer: {JobEmployers[i]}"
+                            $"Employer: {JobEmployers[i]} | " +
+                            $"Employer Location: {employerLocation} | " +
+                            $"Contact: {employerContact}"
                         );
                         count++;
                     }
                 }
+            
 
                 if (count == 0)
                 {
