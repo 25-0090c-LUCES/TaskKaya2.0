@@ -377,7 +377,7 @@
                 }
 
                 Console.WriteLine(" [1] Find a Job / Apply");
-                Console.WriteLine(" [2] PostAndManageJobs");
+                Console.WriteLine(" [2] Post And ManageJobs");
                 Console.WriteLine(" [3] Track My Ongoing Work");
                 Console.ForegroundColor = ConsoleColor.Yellow;
                 Console.WriteLine(" [4] Check Notifications Inbox (Approved/Finished/Declined)");
@@ -580,7 +580,19 @@
                                 if (jobIdx != -1 && JobStatuses[jobIdx] == "AVAILABLE")
                                 {
                                     string workerScore = GetUserAverageRating(workerName);
-                                    Console.WriteLine($" [{applicantCount + 1}] Job ID: {targetJobId} ({JobTitles[jobIdx]}) | Applicant: {workerName} | Rating: {workerScore}");
+                                    string workerLocation = "";
+                                    string workerContact = "";
+                                    for (int k = 0; k < UserNames.Count; k++)
+                                    {
+                                        if (UserNames[k].Equals(workerName, StringComparison.OrdinalIgnoreCase))
+                                        {
+                                            workerLocation = UserLoc[k];
+                                            workerContact = UserConNum[k];
+                                            break;
+                                        }
+                                    }
+
+                                    Console.WriteLine($" [{applicantCount + 1}] Job ID: {targetJobId} ({JobTitles[jobIdx]}) | Applicant: {workerName} | Rating: {workerScore} | Location: {workerLocation} | Contact: {workerContact}");
                                     applicantMapping.Add(parts[3]);
                                     applicantCount++;
                                 }
@@ -831,7 +843,9 @@
                     Console.Clear();
                     Console.ForegroundColor = ConsoleColor.Cyan;
                     Console.WriteLine("===============================================================================");
-                    Console.WriteLine("  MY POSTED JOBS | USER: " + username.ToUpper());
+                    Console.WriteLine("                        MY POSTED JOBS");
+                    Console.WriteLine("===============================================================================");
+                    Console.WriteLine("{0,-8} | {1,-10} | {2,-10} | {3,-10} | {4,-10} | {5,-10} | {6,-10}", "Job ID", "Title", "Location", "Budget", "Worker", "Status", "Applicants");
                     Console.WriteLine("===============================================================================");
                     Console.ResetColor();
 
@@ -840,14 +854,34 @@
                     {
                         if (JobEmployers[i].Equals(username, StringComparison.OrdinalIgnoreCase))
                         {
-                            string workerDisplay = JobWorkers[i] == "None" ? "No worker yet" : JobWorkers[i];
-                            Console.WriteLine($" [ID: {JobIDs[i]}] {JobTitles[i]}");
-                            Console.WriteLine($"      Location : {JobLocations[i]}");
-                            Console.WriteLine($"      Budget   : PHP {JobBudgets[i]}");
-                            Console.WriteLine($"      Status   : {JobStatuses[i]}");
-                            Console.WriteLine($"      Worker   : {workerDisplay}");
-                            Console.WriteLine($"      Rating   : {JobRatings[i]}");
-                            Console.WriteLine();
+                            string workerDisplay;
+                            if (JobWorkers[i] == "None")
+                            {
+                                workerDisplay = "No worker";
+                            }
+                            else
+                            {
+                                workerDisplay = JobWorkers[i];
+                            }
+
+                            // count applicants for this job
+                            int applicantCount = 0;
+                            foreach (string notif in LiveNotifications)
+                            {
+                                string[] parts = notif.Split('|');
+                                if (parts.Length >= 4 &&
+                                    parts[0].Equals(username, StringComparison.OrdinalIgnoreCase) &&
+                                    parts[1] == "APPLIED")
+                                {
+                                    string[] payload = parts[3].Split(';');
+                                    if (payload.Length >= 2 && payload[1] == JobIDs[i])
+                                    {
+                                        applicantCount++;
+                                    }
+                                }
+                            }
+
+                            Console.WriteLine("{0,-8} | {1,-10} | {2,-10} | {3,-10} | {4,-10} | {5,-10} | {6,-10}",JobIDs[i],JobTitles[i],JobLocations[i],"PHP " + JobBudgets[i],workerDisplay,JobStatuses[i],applicantCount);
                             count++;
                         }
                     }
@@ -857,6 +891,7 @@
                         Console.WriteLine("\nYou have not posted any jobs yet.");
                     }
 
+                    Console.WriteLine("===============================================================================");
                     Pause();
                 }
 
