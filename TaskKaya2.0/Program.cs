@@ -973,7 +973,13 @@
                 }
 
                 Console.Clear();
-                Console.WriteLine("=== AVAILABLE JOBS ===");
+                Console.ForegroundColor = ConsoleColor.Cyan;
+                Console.WriteLine("=========================================================================================");
+                Console.WriteLine("                        AVAILABLE JOBS");
+                Console.WriteLine("=========================================================================================");
+                Console.WriteLine("{0,-8} | {1,-10} | {2,-10} | {3,-10} | {4,-10} | {5,-10} | {6,-10}", "Job ID", "Title", "Location", "Budget", "Employer", "Emp. Location", "Contact No.");
+                Console.WriteLine("=========================================================================================");
+                Console.ResetColor();
 
                 int count = 0;
 
@@ -1002,18 +1008,18 @@
                             }
                         }
 
-                        Console.WriteLine(
-                            $"[ID: {JobIDs[i]}] {JobTitles[i]} | " +
-                            $"Job Location: {JobLocations[i]} | " +
-                            $"Budget: PHP {JobBudgets[i]} | " +
-                            $"Employer: {JobEmployers[i]} | " +
-                            $"Employer Location: {employerLocation} | " +
-                            $"Contact: {employerContact}"
-                        );
+                        Console.WriteLine("{0,-8} | {1,-10} | {2,-10} | {3,-10} | {4,-10} | {5,-13} | {6,-15}",
+                            JobIDs[i],
+                            JobTitles[i],
+                            JobLocations[i],
+                            "PHP " + JobBudgets[i],
+                            JobEmployers[i],
+                            employerLocation,
+                            employerContact);
                         count++;
                     }
                 }
-            
+
 
                 if (count == 0)
                 {
@@ -1022,7 +1028,7 @@
                     continue;
                 }
 
-                Console.Write("Enter Job ID to apply for(or enter / to return to main menu.): ");
+                Console.Write("\nEnter Job ID to apply for(or enter / to return to main menu.): ");
                 string targetId = Console.ReadLine().Trim().ToUpper();
 
                 if (targetId == "/")
