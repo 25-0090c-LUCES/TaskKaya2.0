@@ -22,6 +22,7 @@
         static List<string> JobStatuses = new List<string>();
         static List<string> JobRatings = new List<string>();
         static List<string> JobLocations = new List<string>();
+        static List<string> JobDatePosted = new List<string>();
 
         // Engine queues and stacks for simple text parsing
         static Queue<string> LiveNotifications = new Queue<string>();
@@ -538,6 +539,7 @@
                     JobWorkers.Add("None");
                     JobStatuses.Add("AVAILABLE");
                     JobRatings.Add("N/A");
+                    JobDatePosted.Add(DateTime.Now.ToString("MM/dd/yyyy hh:mm tt"));
                     SaveData();
 
                     Console.ForegroundColor = ConsoleColor.Green;
@@ -980,11 +982,12 @@
 
                 Console.Clear();
                 Console.ForegroundColor = ConsoleColor.Cyan;
-                Console.WriteLine("=========================================================================================");
-                Console.WriteLine("                        AVAILABLE JOBS");
-                Console.WriteLine("=========================================================================================");
-                Console.WriteLine("{0,-8} | {1,-10} | {2,-10} | {3,-10} | {4,-10} | {5,-10} | {6,-10}", "Job ID", "Title", "Location", "Budget", "Employer", "Emp. Location", "Contact No.");
-                Console.WriteLine("=========================================================================================");
+                Console.WriteLine("======================================================================================================================");
+                Console.WriteLine("                                                     AVAILABLE JOBS");
+                Console.WriteLine("======================================================================================================================");
+                Console.WriteLine("{0,-8} | {1,-10} | {2,-10} | {3,-10} | {4,-10} | {5,-13} | {6,-15} | {7,-16}",
+                    "Job ID", "Title", "Location", "Budget", "Employer", "Emp. Location", "Contact No.", "Date Posted"); 
+                Console.WriteLine("======================================================================================================================");
                 Console.ResetColor();
 
                 int count = 0;
@@ -1014,14 +1017,15 @@
                             }
                         }
 
-                        Console.WriteLine("{0,-8} | {1,-10} | {2,-10} | {3,-10} | {4,-10} | {5,-13} | {6,-15}",
+                        Console.WriteLine("{0,-8} | {1,-10} | {2,-10} | {3,-10} | {4,-10} | {5,-13} | {6,-15} | {7,-16}",
                             JobIDs[i],
                             JobTitles[i],
                             JobLocations[i],
                             "PHP " + JobBudgets[i],
                             JobEmployers[i],
                             employerLocation,
-                            employerContact);
+                            employerContact,
+                            JobDatePosted[i]);
                         count++;
                     }
                 }
@@ -1422,7 +1426,7 @@
                 jobLines.Add(JobIDs[i] + "|" + JobTitles[i] + "|" + JobLocations[i] +
              "|" + JobBudgets[i] + "|" + JobEmployers[i] +
              "|" + JobWorkers[i] + "|" + JobStatuses[i] +
-             "|" + JobRatings[i]);
+             "|" + JobRatings[i] + "|" + JobDatePosted[i]);
             File.WriteAllLines("jobs_universal.txt", jobLines);
 
             File.WriteAllLines("notifications_universal.txt", LiveNotifications.ToArray());
@@ -1461,7 +1465,7 @@
                 foreach (string line in File.ReadAllLines("jobs_universal.txt"))
                 {
                     string[] p = line.Split('|');
-                    if (p.Length == 8)
+                    if (p.Length == 9)
                     {
                         JobIDs.Add(p[0]);
                         JobTitles.Add(p[1]);
@@ -1471,6 +1475,7 @@
                         JobWorkers.Add(p[5]);
                         JobStatuses.Add(p[6]);
                         JobRatings.Add(p[7]);
+                        JobDatePosted.Add(p[8]);
                     }
                 }
             }
