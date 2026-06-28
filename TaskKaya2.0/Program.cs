@@ -717,6 +717,8 @@
                     Console.WriteLine("===============================================================================");
                     Console.WriteLine("  VERIFY COMPLETIONS");
                     Console.WriteLine("===============================================================================");
+                    Console.WriteLine("{0,-8} | {1,-20} | {2,-15} | {3,-10}", "Job ID", "Title", "Worker", "Budget");
+                    Console.WriteLine("===============================================================================");
                     Console.ResetColor();
 
                     int pendingCount = 0;
@@ -725,7 +727,11 @@
                         if (JobEmployers[i].Equals(username, StringComparison.OrdinalIgnoreCase) &&
                             JobStatuses[i] == "PENDING_VERIFICATION")
                         {
-                            Console.WriteLine($" [ID: {JobIDs[i]}] {JobTitles[i]} | Worker: {JobWorkers[i]} | Budget: PHP {JobBudgets[i]}");
+                            Console.WriteLine("{0,-8} | {1,-20} | {2,-15} | {3,-10}",
+                                JobIDs[i],
+                                JobTitles[i],
+                                JobWorkers[i],
+                                "PHP " + JobBudgets[i]);
                             pendingCount++;
                         }
                     }
@@ -1184,15 +1190,23 @@
         }
         static void TrackWorkerContracts(string username)
         {
-            Console.Clear();
-            Console.WriteLine("=== TRACK MY ONGOING WORK ===");
-
             int ongoingCount = 0;
+            Console.Clear();
+            Console.WriteLine("===============================================================================");
+            Console.WriteLine("                      MY ONGOING WORK");
+            Console.WriteLine("===============================================================================");
+            Console.WriteLine("{0,-8} | {1,-20} | {2,-10} | {3,-15}", "Job ID", "Title", "Earnings", "Client");
+            Console.WriteLine("===============================================================================");
+
             for (int i = 0; i < JobIDs.Count; i++)
             {
                 if (JobWorkers[i].Equals(username, StringComparison.OrdinalIgnoreCase) && JobStatuses[i] == "ONGOING")
                 {
-                    Console.WriteLine(" -> [ID: " + JobIDs[i] + "] " + JobTitles[i] + " | Earnings: PHP " + JobBudgets[i] + " | Client: " + JobEmployers[i]);
+                    Console.WriteLine("{0,-8} | {1,-20} | {2,-10} | {3,-15}",
+                        JobIDs[i],
+                        JobTitles[i],
+                        "PHP " + JobBudgets[i],
+                        JobEmployers[i]);
                     ongoingCount++;
                 }
             }
@@ -1363,10 +1377,14 @@
         }
         static void ViewMyLedger(string username)
         {
-            Console.Clear();
-            Console.WriteLine("=== MY HISTORY LEDGER ===");
-
             int displayCount = 0;
+            Console.Clear();
+            Console.WriteLine("====================================================================================");
+            Console.WriteLine("                        MY HISTORY LEDGER");
+            Console.WriteLine("====================================================================================");
+            Console.WriteLine("{0,-8} | {1,-10} | {2,-12} | {3,-12} | {4,-10} | {5,-8} | {6,-10}", "Job ID", "Title", "Employer", "Worker", "Paid", "Rating", "Your Role");
+            Console.WriteLine("====================================================================================");
+
             foreach (string log in TransactionHistory)
             {
                 string[] p = log.Split('|');
@@ -1378,7 +1396,8 @@
                     if (isEmployer || isWorker)
                     {
                         string role = isEmployer ? "Employer" : "Worker";
-                        Console.WriteLine(" -> ID: " + p[0] + " | Job: " + p[1] + " | Employer: " + p[2] + " | Worker: " + p[3] + " | Paid: PHP " + p[4] + " | Rating: " + p[5] + " | Your Role: " + role);
+                        Console.WriteLine("{0,-8} | {1,-10} | {2,-12} | {3,-12} | {4,-10} | {5,-8} | {6,-10}",
+                            p[0], p[1], p[2], p[3], "PHP " + p[4], p[5], role);
                         displayCount++;
                     }
                 }
