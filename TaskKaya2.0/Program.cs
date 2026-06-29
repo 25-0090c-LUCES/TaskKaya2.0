@@ -426,12 +426,10 @@
                 Console.ResetColor();
 
                 Console.WriteLine(" [1] Post a Job");
-                Console.WriteLine(" [2] Review Applicants");
+                Console.WriteLine(" [2] Manage Posted Jobs");
                 Console.WriteLine(" [3] Verify Completions");
-                Console.WriteLine(" [4] View My Posted Jobs");
                 Console.WriteLine(" [0] Return to Dashboard");
                 Console.WriteLine("-------------------------------------------------------------------------------");
-
                 Console.Write("Enter number of choice: ");
                 if (!int.TryParse(Console.ReadLine(), out int choice))
                 {
@@ -551,39 +549,123 @@
                 // ── [2] REVIEW APPLICANTS ─────────────────────────────────────────────────
                 else if (choice == 2)
                 {
-                    Console.Clear();
-                    Console.ForegroundColor = ConsoleColor.Cyan;
-                    Console.WriteLine("===============================================================================");
-                    Console.WriteLine("  REVIEW APPLICANTS");
-                    Console.WriteLine("===============================================================================");
-                    Console.ResetColor();
-
-                    int applicantCount = 0;
-                    List<string> applicantMapping = new List<string>();
-
-                    foreach (string notif in LiveNotifications)
+                    while (true)
                     {
-                        string[] parts = notif.Split('|');
-                        if (parts.Length >= 4 && parts[1] == "APPLIED" &&
-                            parts[0].Equals(username, StringComparison.OrdinalIgnoreCase))
-                        {
-                            string[] payload = parts[3].Split(';');
-                            if (payload.Length >= 2)
-                            {
-                                string workerName = payload[0];
-                                string targetJobId = payload[1];
+                        Console.Clear();
+                        Console.ForegroundColor = ConsoleColor.Cyan;
+                        Console.WriteLine("=========================================================================================");
+                        Console.WriteLine("                     MY POSTED JOBS");
+                        Console.WriteLine("=========================================================================================");
+                        Console.WriteLine("{0,-8} | {1,-10} | {2,-10} | {3,-12} | {4,-10} | {5,-10} | {6,-10}",
+                            "Job ID", "Title", "Location", "Budget", "Worker", "Status", "Applicants");
+                        Console.WriteLine("=========================================================================================");
+                        Console.ResetColor();
 
-                                int jobIdx = -1;
-                                for (int j = 0; j < JobIDs.Count; j++)
+                        int count = 0;
+                        for (int i = 0; i < JobIDs.Count; i++)
+                        {
+                            if (JobEmployers[i].Equals(username, StringComparison.OrdinalIgnoreCase))
+                            {
+                                string workerDisplay = JobWorkers[i] == "None" ? "No worker" : JobWorkers[i];
+
+                                int applicantCount = 0;
+                                foreach (string notif in LiveNotifications)
                                 {
-                                    if (JobIDs[j] == targetJobId) { jobIdx = j; break; }
+                                    string[] parts = notif.Split('|');
+                                    if (parts.Length >= 4 &&
+                                        parts[0].Equals(username, StringComparison.OrdinalIgnoreCase) &&
+                                        parts[1] == "APPLIED")
+                                    {
+                                        string[] payload = parts[3].Split(';');
+                                        if (payload.Length >= 2 && payload[1] == JobIDs[i])
+                                            applicantCount++;
+                                    }
                                 }
 
-                                if (jobIdx != -1 && JobStatuses[jobIdx] == "AVAILABLE")
+                                Console.WriteLine("{0,-8} | {1,-10} | {2,-10} | {3,-12} | {4,-10} | {5,-10} | {6,-10}",
+                                    JobIDs[i],
+                                    JobTitles[i],
+                                    JobLocations[i],
+                                    "PHP " + JobBudgets[i],
+                                    workerDisplay,
+                                    JobStatuses[i],
+                                    applicantCount);
+                                count++;
+                            }
+                        }
+
+                        if (count == 0)
+                        {
+                            Console.WriteLine("\nYou have not posted any jobs yet.");
+                            Pause();
+                            break;
+                        }
+
+                        Console.WriteLine("=========================================================================================");
+                        Console.Write("\nEnter Job ID to view applicants (or / to return): ");
+                        string selectedJobId = Console.ReadLine().Trim().ToUpper();
+
+                        if (selectedJobId == "/") break;
+
+                        if (string.IsNullOrWhiteSpace(selectedJobId))
+                        {
+                            Console.ForegroundColor = ConsoleColor.Red;
+                            Console.WriteLine("\n[ERROR] Job ID cannot be empty.");
+                            Console.ResetColor();
+                            Pause();
+                            continue;
+                        }
+
+                        // find the job
+                        int jobIdx = -1;
+                        for (int i = 0; i < JobIDs.Count; i++)
+                        {
+                            if (JobIDs[i] == selectedJobId &&
+                                JobEmployers[i].Equals(username, StringComparison.OrdinalIgnoreCase))
+                            {
+                                jobIdx = i;
+                                break;
+                            }
+                        }
+
+                        if (jobIdx == -1)
+                        {
+                            Console.ForegroundColor = ConsoleColor.Red;
+                            Console.WriteLine("\n[ERROR] Job ID not found or not yours.");
+                            Console.ResetColor();
+                            Pause();
+                            continue;
+                        }
+
+                        // gather applicants for selected job
+                        List<string> applicantMapping = new List<string>();
+                        Console.Clear();
+                        Console.ForegroundColor = ConsoleColor.Cyan;
+                        Console.WriteLine("===============================================================================");
+                        Console.WriteLine($" JOB: {JobIDs[jobIdx]} — {JobTitles[jobIdx]} | Status: {JobStatuses[jobIdx]}");
+                        Console.WriteLine("===============================================================================");
+                        Console.WriteLine("{0,-5} | {1,-15} | {2,-22} | {3,-15} | {4,-15}",
+                            "No.", "Applicant", "Rating", "Location", "Contact");
+                        Console.WriteLine("===============================================================================");
+                        Console.ResetColor();
+
+                        int appCount = 0;
+                        foreach (string notif in LiveNotifications)
+                        {
+                            string[] parts = notif.Split('|');
+                            if (parts.Length >= 4 &&
+                                parts[0].Equals(username, StringComparison.OrdinalIgnoreCase) &&
+                                parts[1] == "APPLIED")
+                            {
+                                string[] payload = parts[3].Split(';');
+                                if (payload.Length >= 2 && payload[1] == selectedJobId &&
+                                    JobStatuses[jobIdx] == "AVAILABLE")
                                 {
+                                    string workerName = payload[0];
                                     string workerScore = GetUserAverageRating(workerName);
                                     string workerLocation = "";
                                     string workerContact = "";
+
                                     for (int k = 0; k < UserNames.Count; k++)
                                     {
                                         if (UserNames[k].Equals(workerName, StringComparison.OrdinalIgnoreCase))
@@ -594,121 +676,106 @@
                                         }
                                     }
 
-                                    Console.WriteLine($" [{applicantCount + 1}] Job ID: {targetJobId} ({JobTitles[jobIdx]}) | Applicant: {workerName} | Rating: {workerScore} | Location: {workerLocation} | Contact: {workerContact}");
+                                    Console.WriteLine("{0,-5} | {1,-15} | {2,-10} | {3,-15} | {4,-15}",
+                                        appCount + 1,
+                                        workerName,
+                                        workerScore,
+                                        workerLocation,
+                                        workerContact);
                                     applicantMapping.Add(parts[3]);
-                                    applicantCount++;
+                                    appCount++;
                                 }
                             }
                         }
-                    }
+                        Console.WriteLine("===============================================================================");
 
-                    if (applicantCount == 0)
-                    {
-                        Console.WriteLine("\nNo pending applicants at this time.");
-                        Pause();
-                        continue;
-                    }
 
-                    int appIndex;
-                    while (true)
-                    {
-                        Console.Write("\nEnter applicant number to evaluate (or / to return): ");
-                        string input = Console.ReadLine();
-
-                        if (input == "/")
+                        if (appCount == 0)
                         {
-                            appIndex = -1;
-                            break;
-                        }
-
-                        if (!int.TryParse(input, out appIndex))
-                        {
-                            Console.ForegroundColor = ConsoleColor.Red;
-                            Console.WriteLine("[ERROR] Invalid input. Enter a number or '/' to return.");
-                            Console.ResetColor();
+                            Console.WriteLine("\nNo pending applicants for this job.");
+                            Pause();
                             continue;
                         }
 
-                        if (appIndex >= 1 && appIndex <= applicantMapping.Count)
-                            break;
+                        int appIndex;
+                        while (true)
+                        {
+                            Console.Write("\nEnter applicant number to evaluate (or / to return): ");
+                            string input = Console.ReadLine().Trim();
 
-                        Console.ForegroundColor = ConsoleColor.Red;
-                        Console.WriteLine("[ERROR] Number out of range. Please try again.");
-                        Console.ResetColor();
-                    }
+                            if (input == "/") { appIndex = -1; break; }
 
-                    if (appIndex == -1)
-                        continue;
+                            if (!int.TryParse(input, out appIndex))
+                            {
+                                Console.ForegroundColor = ConsoleColor.Red;
+                                Console.WriteLine("[ERROR] Numbers only.");
+                                Console.ResetColor();
+                                continue;
+                            }
 
-                    appIndex--;
-                    string[] selectedPayload = applicantMapping[appIndex].Split(';');
-                    string selectedWorker = selectedPayload[0];
-                    string selectedJobId = selectedPayload[1];
+                            if (appIndex >= 1 && appIndex <= applicantMapping.Count) break;
 
-                    int matchIndex = -1;
-                    for (int j = 0; j < JobIDs.Count; j++)
-                    {
-                        if (JobIDs[j] == selectedJobId) { matchIndex = j; break; }
-                    }
+                            Console.ForegroundColor = ConsoleColor.Red;
+                            Console.WriteLine("[ERROR] Number out of range.");
+                            Console.ResetColor();
+                        }
 
-                    if (matchIndex == -1)
-                    {
-                        Console.ForegroundColor = ConsoleColor.Red;
-                        Console.WriteLine("[ERROR] Job no longer exists.");
-                        Console.ResetColor();
+                        if (appIndex == -1) continue;
+
+                        appIndex--;
+                        string[] selectedPayload = applicantMapping[appIndex].Split(';');
+                        string selectedWorker = selectedPayload[0];
+
+                        Console.Clear();
+                        Console.WriteLine($"Job:      {JobIDs[jobIdx]} — {JobTitles[jobIdx]}");
+                        Console.WriteLine($"Applicant: {selectedWorker}");
+                        Console.WriteLine($"Rating:   {GetUserAverageRating(selectedWorker)}");
+                        Console.WriteLine("-------------------------------------------------------------------------------");
+                        Console.WriteLine(" [1] Accept — move to ONGOING");
+                        Console.WriteLine(" [2] Decline applicant");
+
+                        int decision;
+                        while (true)
+                        {
+                            Console.Write("Enter action: ");
+                            if (int.TryParse(Console.ReadLine(), out decision)) break;
+                            Console.ForegroundColor = ConsoleColor.Red;
+                            Console.WriteLine("[ERROR] Numbers only.");
+                            Console.ResetColor();
+                        }
+
+                        if (decision == 1)
+                        {
+                            JobStatuses[jobIdx] = "ONGOING";
+                            JobWorkers[jobIdx] = selectedWorker;
+                            AddNotification(selectedWorker, "APPROVED",
+                                $"Employer '{username}' accepted you for '{JobTitles[jobIdx]}' (ID: {JobIDs[jobIdx]}). You can start work now.");
+                            RemoveApplicationNotification(username, selectedWorker, selectedJobId);
+                            AutoDeclineOtherApplicants(username, selectedJobId, JobTitles[jobIdx], selectedWorker);
+                            SaveData();
+                            Console.ForegroundColor = ConsoleColor.Green;
+                            Console.WriteLine("\n[SUCCESS] Contract finalized. Worker can now track their ongoing duties.");
+                            Console.ResetColor();
+                        }
+                        else if (decision == 2)
+                        {
+                            AddNotification(selectedWorker, "DECLINED",
+                                $"Your application for '{JobTitles[jobIdx]}' (ID: {JobIDs[jobIdx]}) was declined.");
+                            RemoveApplicationNotification(username, selectedWorker, selectedJobId);
+                            SaveData();
+                            Console.ForegroundColor = ConsoleColor.Yellow;
+                            Console.WriteLine("\n[INFO] Applicant declined.");
+                            Console.ResetColor();
+                        }
+                        else
+                        {
+                            Console.ForegroundColor = ConsoleColor.Red;
+                            Console.WriteLine("\n[ERROR] Invalid choice.");
+                            Console.ResetColor();
+                        }
+
                         Pause();
-                        continue;
                     }
-
-                    Console.Clear();
-                    Console.WriteLine($"Job:{JobIDs[matchIndex]} — {JobTitles[matchIndex]}");
-                    Console.WriteLine($"Applicant:{selectedWorker}");
-                    Console.WriteLine($"Rating:{GetUserAverageRating(selectedWorker)}");
-                    Console.WriteLine("-------------------------------------------------------------------------------");
-                    Console.WriteLine(" [1] Accept — move to ONGOING");
-                    Console.WriteLine(" [2] Decline applicant");
-
-                    int decision;
-                    while (true)
-                    {
-                        Console.Write("Enter action: ");
-                        if (int.TryParse(Console.ReadLine(), out decision)) break;
-                        Console.ForegroundColor = ConsoleColor.Red;
-                        Console.WriteLine("[ERROR] Invalid input. Numbers only.");
-                        Console.ResetColor();
-                    }
-
-                    if (decision == 1)
-                    {
-                        JobStatuses[matchIndex] = "ONGOING";
-                        JobWorkers[matchIndex] = selectedWorker;
-                        AddNotification(selectedWorker, "APPROVED",
-                            $"Employer '{username}' accepted you for '{JobTitles[matchIndex]}' (ID: {JobIDs[matchIndex]}). You can start work now.");
-                        RemoveApplicationNotification(username, selectedWorker, selectedJobId);
-                        AutoDeclineOtherApplicants(username, selectedJobId, JobTitles[matchIndex], selectedWorker);
-                        SaveData();
-                        Console.ForegroundColor = ConsoleColor.Green;
-                        Console.WriteLine("\n[SUCCESS] Contract finalized. Worker can now track their ongoing duties.");
-                        Console.ResetColor();
-                    }
-                    else if (decision == 2)
-                    {
-                        AddNotification(selectedWorker, "DECLINED",
-                            $"Your application for '{JobTitles[matchIndex]}' (ID: {JobIDs[matchIndex]}) was declined.");
-                        RemoveApplicationNotification(username, selectedWorker, selectedJobId);
-                        SaveData();
-                        Console.ForegroundColor = ConsoleColor.Yellow;
-                        Console.WriteLine("\n[INFO] Applicant declined.");
-                        Console.ResetColor();
-                    }
-                    else
-                    {
-                        Console.ForegroundColor = ConsoleColor.Red;
-                        Console.WriteLine("\n[ERROR] Invalid choice.");
-                        Console.ResetColor();
-                    }
-
-                    Pause();
                 }
 
                 // ── [3] VERIFY COMPLETIONS ────────────────────────────────────────────────
@@ -844,65 +911,6 @@
 
                     Pause();
                 }
-
-                // ── [4] VIEW MY POSTED JOBS ───────────────────────────────────────────────
-                else if (choice == 4)
-                {
-                    Console.Clear();
-                    Console.ForegroundColor = ConsoleColor.Cyan;
-                    Console.WriteLine("===============================================================================");
-                    Console.WriteLine("                        MY POSTED JOBS");
-                    Console.WriteLine("===============================================================================");
-                    Console.WriteLine("{0,-8} | {1,-10} | {2,-10} | {3,-10} | {4,-10} | {5,-10} | {6,-10}", "Job ID", "Title", "Location", "Budget", "Worker", "Status", "Applicants");
-                    Console.WriteLine("===============================================================================");
-                    Console.ResetColor();
-
-                    int count = 0;
-                    for (int i = 0; i < JobIDs.Count; i++)
-                    {
-                        if (JobEmployers[i].Equals(username, StringComparison.OrdinalIgnoreCase))
-                        {
-                            string workerDisplay;
-                            if (JobWorkers[i] == "None")
-                            {
-                                workerDisplay = "No worker";
-                            }
-                            else
-                            {
-                                workerDisplay = JobWorkers[i];
-                            }
-
-                            // count applicants for this job
-                            int applicantCount = 0;
-                            foreach (string notif in LiveNotifications)
-                            {
-                                string[] parts = notif.Split('|');
-                                if (parts.Length >= 4 &&
-                                    parts[0].Equals(username, StringComparison.OrdinalIgnoreCase) &&
-                                    parts[1] == "APPLIED")
-                                {
-                                    string[] payload = parts[3].Split(';');
-                                    if (payload.Length >= 2 && payload[1] == JobIDs[i])
-                                    {
-                                        applicantCount++;
-                                    }
-                                }
-                            }
-
-                            Console.WriteLine("{0,-8} | {1,-10} | {2,-10} | {3,-10} | {4,-10} | {5,-10} | {6,-10}",JobIDs[i],JobTitles[i],JobLocations[i],"PHP " + JobBudgets[i],workerDisplay,JobStatuses[i],applicantCount);
-                            count++;
-                        }
-                    }
-
-                    if (count == 0)
-                    {
-                        Console.WriteLine("\nYou have not posted any jobs yet.");
-                    }
-
-                    Console.WriteLine("===============================================================================");
-                    Pause();
-                }
-
                 else
                 {
                     Console.ForegroundColor = ConsoleColor.Red;
@@ -1128,7 +1136,7 @@
                 }
             }
 
-            if (jobCount == 0) return "No performance reviews yet";
+            if (jobCount == 0) return "No performance reviews";
             int average = (int)Math.Round((double)totalStars / jobCount);
             return new string('*', average);
         }
@@ -1504,5 +1512,3 @@
     }
 
 }
-
-
